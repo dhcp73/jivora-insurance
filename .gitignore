@@ -11,3 +11,5 @@ playwright-report
 tsconfig.tsbuildinfo
 *.log
 screenshots/.tmp
+logs/*.pid
+logs/*.log
