@@ -1,0 +1,13 @@
+node_modules
+.next
+data/*.db
+data/*.db-*
+data/uploads
+.env
+.env.local
+.DS_Store
+test-results
+playwright-report
+tsconfig.tsbuildinfo
+*.log
+screenshots/.tmp
