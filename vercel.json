@@ -1,5 +1,8 @@
 {
   "framework": "nextjs",
   "buildCommand": "STORAGE_MODE=demo next build",
-  "installCommand": "npm install --ignore-scripts"
+  "installCommand": "npm install --ignore-scripts",
+  "env": {
+    "STORAGE_MODE": "demo"
+  }
 }
