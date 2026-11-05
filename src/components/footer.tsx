@@ -79,7 +79,18 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-slate-200 py-4 text-center text-xs text-slate-500 dark:border-navy-800">
-        © {new Date().getFullYear()} {site.name}. All rights reserved.
+        <p>© {new Date().getFullYear()} {site.name}. All rights reserved.</p>
+        <p className="mt-1.5 text-[11px] tracking-wide text-slate-400 dark:text-slate-500">
+          Built by{" "}
+          <a
+            href="https://github.com/rahulpatel84"
+            target="_blank"
+            rel="noreferrer"
+            className="font-medium text-slate-500 underline-offset-2 hover:text-orange-600 hover:underline dark:text-slate-400"
+          >
+            Rahul Patel
+          </a>
+        </p>
       </div>
     </footer>
   );

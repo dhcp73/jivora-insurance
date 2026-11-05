@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { getSession } from "@/lib/auth";
 import { getDb, now, uploadsDir } from "@/lib/db";
+import { isDemoMode } from "@/lib/mode";
 import { newId } from "@/lib/ids";
 
 export async function GET() {
@@ -21,8 +22,10 @@ export async function POST(req: Request) {
   if (file.size > 5 * 1024 * 1024) return NextResponse.json({ error: "Max 5MB" }, { status: 400 });
   const id = newId("doc");
   const stored = `${id}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-  const buf = Buffer.from(await file.arrayBuffer());
-  fs.writeFileSync(path.join(uploadsDir(), stored), buf);
+  if (!isDemoMode()) {
+    const buf = Buffer.from(await file.arrayBuffer());
+    fs.writeFileSync(path.join(uploadsDir(), stored), buf);
+  }
   getDb().prepare(
     `INSERT INTO documents (id, user_id, policy_id, filename, stored_name, mime, size, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,

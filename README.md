@@ -55,3 +55,13 @@ See [`docs/RESEARCH.md`](docs/RESEARCH.md) for industry sources, TP rate anchors
 ## Environment
 
 Copy `.env.example`. Without SMTP, emails are logged to the admin **outbox** tab.
+
+
+## Storage modes
+
+| Mode | When | Backend |
+|------|------|---------|
+| `sqlite` (default) | Local Node | `better-sqlite3` file DB in `data/` |
+| `demo` | Vercel / `STORAGE_MODE=demo` | Pure in-memory store (seeded admin/demo users). No native addon. |
+
+On Vercel, `VERCEL=1` auto-enables demo mode. Data is ephemeral across cold starts.

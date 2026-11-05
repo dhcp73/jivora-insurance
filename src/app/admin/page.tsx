@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db";
 import { PageHero } from "@/components/page-hero";
 import { LogoutButton } from "@/components/logout-button";
 import { AdminPanels } from "@/components/admin-panels";
+import { isDemoMode } from "@/lib/mode";
 
 export default async function AdminPage() {
   const session = await getSession();
@@ -27,6 +28,14 @@ export default async function AdminPage() {
   return (
     <>
       <PageHero eyebrow="Admin" title="Maintainer dashboard" description="Leads, quotes, customers, policies, reminders and email outbox." />
+      {isDemoMode() ? (
+        <div className="container-page pt-4">
+          <div className="rounded-xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-100">
+            <strong>Demo mode:</strong> this deployment uses an ephemeral in-memory store (no persistent SQLite).
+            Seeded accounts reset on cold starts. Configure SMTP and a durable database for production use.
+          </div>
+        </div>
+      ) : null}
       <div className="container-page flex flex-wrap items-center justify-between gap-3 py-4">
         <div className="flex flex-wrap gap-2 text-sm">
           {Object.entries(stats).map(([k, v]) => (
