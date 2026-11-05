@@ -2,6 +2,8 @@ import crypto from "node:crypto";
 import { cookies } from "next/headers";
 import { getDb, now } from "./db";
 import { newId, randomString, sha256 } from "./ids";
+import { isDemoMode } from "./mode";
+import { mintSessionToken, parseSessionToken, preferSignedSession } from "./session-token";
 
 export type Role = "customer" | "admin";
 
@@ -83,8 +85,26 @@ export function authenticate(email: string, password: string): { userId: string 
 }
 
 export function createSession(userId: string): string {
-  const token = randomString(40);
   const expires = new Date(Date.now() + SESSION_DAYS * 864e5).toISOString();
+  if (preferSignedSession()) {
+    const u = getDb()
+      .prepare(
+        "SELECT id, email, name, phone, role, created_at AS createdAt FROM users WHERE id = ?",
+      )
+      .get(userId) as User | undefined;
+    if (!u) throw new AuthError("User not found for session");
+    // Best-effort local session row (may not be shared across serverless instances).
+    try {
+      const opaque = randomString(40);
+      getDb()
+        .prepare("INSERT INTO sessions (id, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
+        .run(sha256(opaque), userId, expires, now());
+    } catch {
+      /* ignore */
+    }
+    return mintSessionToken(u, expires);
+  }
+  const token = randomString(40);
   getDb()
     .prepare("INSERT INTO sessions (id, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)")
     .run(sha256(token), userId, expires, now());
@@ -93,6 +113,12 @@ export function createSession(userId: string): string {
 
 export function getSessionByToken(token: string | undefined | null): SessionInfo | null {
   if (!token) return null;
+  const signed = parseSessionToken(token);
+  if (signed) return signed;
+  if (isDemoMode() && preferSignedSession()) {
+    // Opaque tokens from older demo deploys won't resolve across instances.
+    return null;
+  }
   const db = getDb();
   const s = db
     .prepare("SELECT id, user_id, expires_at FROM sessions WHERE id = ?")

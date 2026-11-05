@@ -23,6 +23,7 @@ export async function POST(req: Request) {
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
+      secure: process.env.VERCEL === "1" || process.env.NODE_ENV === "production",
     });
     return res;
   } catch (e) {
